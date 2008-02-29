@@ -380,7 +380,9 @@ class GladeHandlers:
             player1tup = (ARTIFICIAL, discoverer.initAndStartEngine,
                     (engine, 1-color, difficulty, 5*60, 0), name)
         
-        ionest.generalStart(gamemodel, player0tup, player1tup)
+        if color == WHITE:
+            ionest.generalStart(gamemodel, player0tup, player1tup)
+        else: ionest.generalStart(gamemodel, player1tup, player0tup)
     
     def on_internetTasker_connect (tasker, asGuest, username, password):
         ICLogon.run()
