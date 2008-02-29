@@ -401,14 +401,20 @@ class PyChess:
         self.handleArgs(args)
     
     def mainWindowSize (self, window):
-        def savePosition ():
-            conf.set("window_width", window.get_allocation().width)
-            conf.set("window_height", window.get_allocation().height)
-        atexit.register(savePosition)
-        width = conf.get("window_width", 0)
-        height = conf.get("window_height", 0)
-        if width and height:
-            window.resize(width, height)
+        def savePosition (window, event):
+            conf.set("window_width",  window.get_size()[0])
+            conf.set("window_height", window.get_size()[1])
+            conf.set("window_x", window.get_position()[0])
+            conf.set("window_y", window.get_position()[1])
+        window.connect("delete-event", savePosition)
+        
+        width = conf.get("window_width", 575)
+        height = conf.get("window_height", 515)
+        window.resize(width, height)
+        x = conf.get("window_x", gtk.gdk.screen_width()/2-width/2)
+        # As default, put center on upper golden ratio line
+        y = conf.get("window_y", int(gtk.gdk.screen_height()/2.618)-height/2)
+        window.move(x, y)
     
     def initGlade(self):
         global window
