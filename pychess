@@ -3,9 +3,10 @@
 # PyChess startup script
 #
 
-import os, sys
+import os, sys, re
 import pygtk
 pygtk.require("2.0")
+import gtk, gtk.glade, gettext
 
 if not "HOME" in os.environ:
     os.environ["HOME"] = os.path.expanduser("~")
@@ -35,6 +36,52 @@ gtk.glade.textdomain("pychess")
 # This is an ugly hack needed prior to gtkSourceView2 because of a pygtk bug:
 # http://bugzilla.gnome.org/show_bug.cgi?id=393483
 os.environ["XDG_DATA_DIRS"] = getDataPrefix()+":/usr/share/"
+
+# Monkeypatch for icon_lookup which doens't seam to work on some KDE systems
+icons = gtk.icon_theme_get_default()
+if not icons.lookup_icon("weather-clear", 16, gtk.ICON_LOOKUP_USE_BUILTIN):
+    class SimpleIconTheme:
+        def __init__ (self):
+            self.sizeDirReg = re.compile("(\d+)x(\d+)")
+            folders = ("/usr/share/icons/", "/usr/local/share/icons/")
+            self.icons = {}
+            for folder in folders:
+                if os.path.isdir(folder):
+                    self.loadIcons(folder, self.icons)
+        
+        def loadIcons (self, folder, dic, size=None):
+            for file in os.listdir(folder):
+                joined = os.path.join(folder, file)
+                if os.path.isdir(joined):
+                    if not size:
+                        match = self.sizeDirReg.match(file)
+                        if match:
+                            subsize = int(match.groups()[0])
+                            self.loadIcons(joined, dic, subsize)
+                            continue
+                    self.loadIcons(joined, dic, size)
+                elif size and file.endswith(".png"):
+                    name = file[:-4]
+                    if not name in dic:
+                        dic[name] = {}
+                    dic[name][size] = joined
+        
+        def load_icon(self, name, size, *args):
+            if name in self.icons:
+                if size in self.icons[name]:
+                    filename = self.icons[name][size]
+                else:
+                    sizes = self.icons[name].keys()
+                    sizes = [(abs(s-size),s) for s in sizes]
+                    sizes.sort()
+                    filename = self.icons[name][sizes[0][1]]
+                return gtk.gdk.pixbuf_new_from_file(filename)
+            else:
+                log.error("Unable to load icon: %s at size: %d\n" % name, size)
+                return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, size, size)
+    
+    simpleIconTheme = SimpleIconTheme()
+    gtk.icon_theme_get_default = lambda: simpleIconTheme
 
 # Let's rumble!
 import pychess.Main
