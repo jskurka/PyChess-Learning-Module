@@ -410,13 +410,25 @@ class PyChess:
             conf.set("window_y", window.get_position()[1])
         window.connect("delete-event", savePosition)
         
-        width = conf.get("window_width", 575)
-        height = conf.get("window_height", 515)
-        window.resize(width, height)
-        x = conf.get("window_x", gtk.gdk.screen_width()/2-width/2)
-        # As default, put center on upper golden ratio line
-        y = conf.get("window_y", int(gtk.gdk.screen_height()/2.618)-height/2)
-        window.move(x, y)
+        def loadPosition (window):
+            width = conf.get("window_width", 575)
+            height = conf.get("window_height", 479)
+            assert width > 0
+            assert height > 0
+            window.resize(width, height)
+            x = conf.get("window_x", gtk.gdk.screen_width()/2-width/2)
+            # As default, put center on upper golden ratio line
+            y = conf.get("window_y", int(gtk.gdk.screen_height()/2.618)-height/2)
+            window.move(x, y)
+        loadPosition(window)
+        
+        # In rare cases, gtk throws some gtk_size_allocation error, which is
+        # probably a race condition. To avoid the window forgets its size in
+        # these cases, we add this extra hook
+        def callback (*args):
+            window.disconnect(handle_id)
+            loadPosition(window)
+        handle_id = window.connect("size-allocate", callback)
     
     def initGlade(self):
         global window
@@ -426,7 +438,7 @@ class PyChess:
         self.widgets = gtk.glade.XML(addDataPrefix("glade/PyChess.glade"))
         
         self.widgets.signal_autoconnect(GladeHandlers.__dict__)
-        
+        self.mainWindowSize(self["window1"])
         self["window1"].show()
         self["Background"].show_all()
         
@@ -440,8 +452,6 @@ class PyChess:
         flags = DEST_DEFAULT_MOTION | DEST_DEFAULT_HIGHLIGHT | DEST_DEFAULT_DROP
         window["menubar1"].drag_dest_set(flags, dnd_list, gtk.gdk.ACTION_COPY)
         window["Background"].drag_dest_set(flags, dnd_list, gtk.gdk.ACTION_COPY)
-        
-        self.mainWindowSize(self["window1"])
         
         #TODO: disabled by default
         #TipOfTheDay.TipOfTheDay()
