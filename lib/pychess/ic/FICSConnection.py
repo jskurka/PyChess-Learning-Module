@@ -12,6 +12,7 @@ from managers.OfferManager import OfferManager
 from managers.ChatManager import ChatManager
 
 from pychess.System.ThreadPool import PooledThread
+from pychess.Utils.const import *
 
 class LogOnError (StandardError): pass
 
@@ -141,6 +142,7 @@ class FICSConnection (Connection):
             self.om = OfferManager(self)
             self.cm = ChatManager(self)
             
+            print >> self.client, "set interface %s %s" % (NAME, VERSION)
             self.connecting = False
             self.connected = True
             self.emit("connected")
