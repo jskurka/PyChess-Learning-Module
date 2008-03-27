@@ -136,7 +136,7 @@ class ICLogon:
         
         self.showConnecting()
         
-        self.connection = FICSConnection("freechess.org", 23, username, password)
+        self.connection = FICSConnection("freechess.org", (23,5000), username, password)
         self.connection.connect("connected", self.onConnected)
         self.connection.connect("disconnected", self.onDisconnected)
         self.connection.connect("error", self.showError)

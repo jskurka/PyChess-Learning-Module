@@ -26,11 +26,11 @@ class Connection (GObject, PooledThread):
         'error':         (SIGNAL_RUN_FIRST, None, (object,)),
     }
     
-    def __init__ (self, host, port, username, password):
+    def __init__ (self, host, ports, username, password):
         GObject.__init__(self)
         
         self.host = host
-        self.port = port
+        self.ports = ports
         self.username = username
         self.password = password
         
@@ -87,8 +87,8 @@ _("Sorry, names can only consist of lower and upper case letters.")
 _("Sorry, names may be at most 17 characters long.")
 
 class FICSConnection (Connection):
-    def __init__ (self, host, port, username="guest", password=""):
-        Connection.__init__(self, host, port, username, password)
+    def __init__ (self, host, ports, username="guest", password=""):
+        Connection.__init__(self, host, ports, username, password)
         self.registred = None
     
     def _connect (self):
@@ -97,7 +97,7 @@ class FICSConnection (Connection):
         try:
             self.client = VerboseTelnet()
             
-            self.client.open(self.host, self.port)
+            self.client.open(self.host, self.ports)
             
             self.client.read_until("login: ")
             

@@ -123,8 +123,13 @@ class VerboseTelnet (Telnet):
             log.warn("Data not written due to closed telnetclient: '%s'"
                     % data, self.name)
     
-    def open(self, host, port):
-        Telnet.open(self, host, port)
+    def open(self, host, ports):
+        for i, port in enumerate(ports):
+            try:
+                Telnet.open(self, host, port)
+            except socket.error:
+                if i == len(ports)-1:
+                    raise
         self.name = "%s#%s" % (self.host, self.port)
         self.connected = True
     
