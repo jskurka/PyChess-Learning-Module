@@ -333,7 +333,7 @@ class FingerManager (GObject):
         self.emit("ratingAdjusted", type, new)
     
     def finger (self, user):
-        print >> self.connection.client, "finger %s /sbl" % user
+        print >> self.connection.client, "finger %s /sblLw" % user
     
     def setFingerNote (self, note, message):
         assert 1 <= note <= 10
