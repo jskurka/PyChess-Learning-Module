@@ -201,3 +201,6 @@ class OfferManager (GObject):
     
     def playIndex (self, index):
         print >> self.connection.client, "play", index
+
+    def adjourn (self):
+        print >> self.connection.client, "adjourn"
