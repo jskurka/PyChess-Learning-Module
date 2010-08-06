@@ -485,14 +485,14 @@ class SeekTabSection (ParrentListSection):
 
     def onPlayingGame (self):
         self.widgets["seekListContent"].set_sensitive(False)
-        self.widgets["challengePanel"].set_sensitive(False)
+        self.widgets["challengeExpander"].set_sensitive(False)
         self.widgets["clearSeeksButton"].set_sensitive(False)
         self.store.clear()
         self.widgets["activeSeeksLabel"].set_text("0 %s" % _("Active Seeks"))
 
     def onCurGameEnded (self):
         self.widgets["seekListContent"].set_sensitive(True)
-        self.widgets["challengePanel"].set_sensitive(True)
+        self.widgets["challengeExpander"].set_sensitive(True)
         self.connection.glm.refreshSeeks()
 
 ########################################################################
