@@ -96,6 +96,12 @@ class ICGameModel (GameModel):
         elif offer.offerType in (RESIGNATION, FLAG_CALL):
             self.connection.om.offer(offer, self.ply)
         
+        elif offer.offerType == ABORT_OFFER:
+            self.connection.om.abort()
+        
+        elif offer.offerType == ADJOURN_OFFER:
+            self.connection.om.adjourn()
+        
         elif offer.offerType in OFFERS:
             if offer not in self.offerMap:
                 self.offerMap[offer] = player

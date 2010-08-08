@@ -56,7 +56,7 @@ class OfferManager (GObject):
         'onOfferRemove' : (SIGNAL_RUN_FIRST, None, (str,)),
         'onChallengeAdd' : (SIGNAL_RUN_FIRST, None, (str,object)),
         'onChallengeRemove' : (SIGNAL_RUN_FIRST, None, (str,)),
-        'onActionError' : (SIGNAL_RUN_FIRST, None, (object,int))
+        'onActionError' : (SIGNAL_RUN_FIRST, None, (object, int)),
     }
     
     def __init__ (self, connection):
@@ -201,3 +201,9 @@ class OfferManager (GObject):
     
     def playIndex (self, index):
         print >> self.connection.client, "play", index
+    
+    def abort (self):
+        print >> self.connection.client, "abort"
+    
+    def adjourn (self):
+        print >> self.connection.client, "adjourn"

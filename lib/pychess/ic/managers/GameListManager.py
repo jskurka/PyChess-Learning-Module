@@ -1,4 +1,4 @@
-from gobject import *
+from gobject import GObject, SIGNAL_RUN_FIRST, TYPE_NONE
 import re
 from pychess.Utils.const import *
 
@@ -178,13 +178,15 @@ class GameListManager (GObject):
     
     ###
     
-    def seek (self, startmin, incsec, rated, ratings=(0,9999), color=None):
+    def seek (self, startmin, incsec, rated, ratings=(0,9999), color=None, variant=NORMALCHESS, manual=False):
         rchar = rated and "r" or "u"
         if color != None:
             cchar = color == WHITE and "w" or "b"
         else: cchar = ""
-        print >> self.connection.client, "seek %d %d %s %s %d-%d" % \
-                (startmin, incsec, rchar, cchar, ratings[0], ratings[1])
+        print "seek %d %d %s %s %d-%d %s %s" % \
+            (startmin, incsec, rchar, cchar, ratings[0], ratings[1], variantToSeek[variant], manual and "m" or "")        
+        print >> self.connection.client, "seek %d %d %s %s %d-%d %s %s" % \
+                (startmin, incsec, rchar, cchar, ratings[0], ratings[1], variantToSeek[variant], manual and "m" or "")
     
     def refreshSeeks (self):
         print >> self.connection.client, "iset seekinfo 1"
@@ -195,6 +197,7 @@ class GameListManager (GObject):
     ###
     
     def on_seek_add (self, match):
+#        print "GLM.on_seek_add: line=%s" % match.groups()[0]
         parts = match.groups()[0].split(" ")
         # The <s> message looks like:
         # <s> index w=name_from ti=titles rt=rating t=time i=increment

@@ -6,7 +6,7 @@ from math import log as ln, ceil
 import Queue
 
 import gobject
-import gtk, gtk.glade
+import gtk.glade
 import pango
 
 from pychess.System import glock
@@ -112,7 +112,7 @@ def appendAutowrapColumn (treeview, defwidth, name, **kvargs):
     return cell
 
 
-methods = (
+METHODS = (
     # gtk.SpinButton should be listed prior to gtk.Entry, as it is a
     # subclass, but requires different handling
     (gtk.SpinButton, ("get_value", "set_value", "value-changed")),
@@ -124,14 +124,13 @@ methods = (
     (ToggleComboBox, ("_get_active", "_set_active", "changed")),
     (gtk.ToggleButton, ("get_active", "set_active", "toggled")),
     (gtk.CheckMenuItem, ("get_active", "set_active", "toggled")),
-    (gtk.Range, ("get_value", "set_value", "value-changed")),
-)
+    (gtk.Range, ("get_value", "set_value", "value-changed")))
 
 def keep (widget, key, get_value_=None, set_value_=None, first_value=None):
     if widget == None:
         raise AttributeError, "key '%s' isn't in widgets" % key
     
-    for class_, methods_ in methods:
+    for class_, methods_ in METHODS:
         if isinstance(widget, class_):
             getter, setter, signal = methods_
             break
@@ -147,12 +146,12 @@ def keep (widget, key, get_value_=None, set_value_=None, first_value=None):
         set_value = lambda v: set_value_(widget, v)
     else:
         set_value = getattr(widget, setter)
-    
+
     def setFromConf ():
         try:
             set_value(conf.getStrict(key))
         except TypeError:
-            log.warn("Key '%s' from conf had the wrong type '%s', ignored" % 
+            log.warn("Key '%s' from conf had the wrong type '%s', ignored" % \
                      (key, type(conf.getStrict(key))))
             if first_value != None:
                 conf.set(key, first_value)
@@ -168,6 +167,72 @@ def keep (widget, key, get_value_=None, set_value_=None, first_value=None):
         setFromConf()
     elif first_value != None:
         conf.set(key, first_value)
+
+# loadDialogWidget() and saveDialogWidget() are similar to uistuff.keep() but are needed
+# for saving widget values for gtk.Dialog instances that are loaded with different
+# sets of values/configurations and which also aren't instant save like in
+# uistuff.keep(), but rather are saved later if and when the user clicks
+# the dialog's OK button
+def loadDialogWidget (widget, widget_name, config_number, get_value_=None, set_value_=None, first_value=None):
+    key = widget_name + "-" + str(config_number)
+    
+    if widget == None:
+        raise AttributeError, "key '%s' isn't in widgets" % widget_name
+    
+    for class_, methods_ in METHODS:
+        if isinstance(widget, class_):
+            getter, setter, signal = methods_
+            break
+    else:
+        if set_value_ == None:
+            raise AttributeError, "I don't have any knowledge of type: '%s'" % widget
+    
+    if get_value_:
+        get_value = lambda: get_value_(widget)
+    else:
+        get_value = getattr(widget, getter)
+
+    if set_value_:
+        set_value = lambda v: set_value_(widget, v)
+    else:
+        set_value = getattr(widget, setter)
+    
+    if conf.hasKey(key):
+        try:
+            set_value(conf.getStrict(key))
+        except TypeError:
+            log.warn("Key '%s' from conf had the wrong type '%s', ignored" % \
+                     (key, type(conf.getStrict(key))))
+            if first_value != None:
+                conf.set(key, first_value)
+            else: conf.set(key, get_value())
+    elif first_value != None:
+        conf.set(key, first_value)
+        set_value(conf.getStrict(key))
+    else:
+        log.warn("Didn't load widget \"%s\": no conf value and no first_value arg" % widget_name)
+
+def saveDialogWidget (widget, widget_name, config_number, get_value_=None):
+    key = widget_name + "-" + str(config_number)
+    
+    if widget == None:
+        raise AttributeError, "key '%s' isn't in widgets" % widget_name
+    
+    for class_, methods_ in METHODS:
+        if isinstance(widget, class_):
+            getter, setter, signal = methods_
+            break
+    else:
+        if get_value_ == None:
+            raise AttributeError, "I don't have any knowledge of type: '%s'" % widget
+    
+    if get_value_:
+        get_value = lambda: get_value_(widget)
+    else:
+        get_value = getattr(widget, getter)
+
+    if not conf.hasKey(key) or conf.getStrict(key) != get_value():
+        conf.set(key, get_value())
 
 POSITION_NONE, POSITION_CENTER, POSITION_GOLDEN = range(3)
 def keepWindowSize (key, window, defaultSize=None, defaultPosition=POSITION_NONE):
@@ -345,7 +410,6 @@ def initLabelLinks (text, url):
     
     return eventbox
 
-
 cachedGlades = {}
 def cacheGladefile(filename):
     """ gtk.glade automatically caches the file, so we only need to use this
@@ -370,6 +434,7 @@ class GladeWidgets:
         
         if not self.glade:
             glock.acquire()
+#            print "uistuff.py:gladefile = %s" % filename
             self.glade = gtk.glade.XML(addDataPrefix("glade/%s" % filename))
             glock.release()
         

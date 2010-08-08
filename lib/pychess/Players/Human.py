@@ -176,7 +176,7 @@ class Human (Player):
         title = _("Your opponent asks you to hurry!")
         description = _("Generally this means nothing, as the game is timebased, but if you want to please your opponent, perhaps you should get going.")
         self._message(title, description, gtk.MESSAGE_INFO, gtk.BUTTONS_OK)
-    
+        
     @glock.glocked
     def pause (self):
         self.gmwidg.setLocked(True)
