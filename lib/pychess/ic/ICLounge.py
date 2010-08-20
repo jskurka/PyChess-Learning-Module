@@ -1216,21 +1216,19 @@ class SeekChallengeSection (ParrentListSection):
             if key in seek:
                 seek_.append(seek[key])
                 if key in ("time", "variant", "color", "rated"):
-                    challenge.append("<b>" + seek[key] + "</b>")
-                else:
                     challenge.append(seek[key])
         seektext = ", ".join(seek_)
         challengetext = ", ".join(challenge)
         
         if seeknumber == 1:
             self.widgets["seek1RadioLabel"].set_text(seektext)
-            self.widgets["challenge1RadioLabel"].set_markup(challengetext)
+            self.widgets["challenge1RadioLabel"].set_text(challengetext)
         elif seeknumber == 2:
             self.widgets["seek2RadioLabel"].set_text(seektext)
-            self.widgets["challenge2RadioLabel"].set_markup(challengetext)
+            self.widgets["challenge2RadioLabel"].set_text(challengetext)
         else:
             self.widgets["seek3RadioLabel"].set_text(seektext)
-            self.widgets["challenge3RadioLabel"].set_markup(challengetext)
+            self.widgets["challenge3RadioLabel"].set_text(challengetext)
         
     def __loadSeekEditor (self, seeknumber):
         for widget in self.seekEditorWidgets:
