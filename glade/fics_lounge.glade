@@ -126,6 +126,7 @@
                           <widget class="GtkExpander" id="seekExpander">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="expanded">True</property>
                             <child>
                               <widget class="GtkAlignment" id="alignment1">
                                 <property name="visible">True</property>
