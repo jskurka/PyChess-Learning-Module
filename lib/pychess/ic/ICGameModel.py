@@ -94,7 +94,7 @@ class ICGameModel (GameModel):
     ############################################################################
     
     def offerRecieved (self, player, offer):
-        log.debug("ICGameModel.offerRecieved: offerer=%s, offer=%s\n" % (repr(player), offer))
+        log.debug("ICGameModel.offerRecieved: offerer=%s %s\n" % (repr(player), offer))
         if player == self.players[WHITE]:
             opPlayer = self.players[BLACK]
         else: opPlayer = self.players[WHITE]
@@ -122,7 +122,7 @@ class ICGameModel (GameModel):
         
         elif offer.type in OFFERS:
             if offer not in self.offers:
-                log.debug("ICGameModel.offerRecieved: %s.offer(offer=%s)\n" % (repr(opPlayer), offer))
+                log.debug("ICGameModel.offerRecieved: %s.offer(%s)\n" % (repr(opPlayer), offer))
                 self.offers[offer] = player
                 opPlayer.offer(offer)
             # If the offer was an update to an old one, like a new takebackvalue
@@ -132,12 +132,12 @@ class ICGameModel (GameModel):
                     del self.offers[offer_]
     
     def acceptRecieved (self, player, offer):
-        log.debug("ICGameModel.acceptRecieved: accepter=%s offer=%s\n" % (repr(player), offer))
+        log.debug("ICGameModel.acceptRecieved: accepter=%s %s\n" % (repr(player), offer))
         if player.__type__ == LOCAL:
             if offer not in self.offers or self.offers[offer] == player:
                 player.offerError(offer, ACTION_ERROR_NONE_TO_ACCEPT)
             else:
-                log.debug("ICGameModel.acceptRecieved: connection.om.accept(offer=%s)" % offer)
+                log.debug("ICGameModel.acceptRecieved: connection.om.accept(%s)" % offer)
                 self.connection.om.accept(offer)
                 del self.offers[offer]
         

@@ -1704,7 +1704,7 @@ class CreatedBoards (Section):
         self.connection.bm.connect ("observeBoardCreated", self.observeBoardCreated)
 
     def playBoardCreated (self, bm, board):
-
+        log.debug("ICLounge.playBoardCreated: %s\n" % board)
         if board["wms"] == 0 and board["bms"] == 0:
             timemodel = None
         else:
