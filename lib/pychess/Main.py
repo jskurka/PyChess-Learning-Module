@@ -31,7 +31,6 @@ from pychess import VERSION, VERSION_NAME
 # gameDic - containing the gamewidget:gamemodel of all open games              #
 ################################################################################
 gameDic = {}
-chessFiles = {}
 
 class GladeHandlers:
     
@@ -93,7 +92,7 @@ class GladeHandlers:
         ICLogon.run()
     
     def on_load_game1_activate (widget):
-        newGameDialog.LoadFileExtension.run(None, chessFiles)
+        newGameDialog.LoadFileExtension.run(None)
     
     def on_set_up_position_activate (widget):
         # Not implemented
@@ -204,6 +203,7 @@ class PyChess:
         # Init glade and the 'GladeHandlers'
         #=======================================================================
         gtk.glade.set_custom_handler(self.widgetHandler)
+        gtk.about_dialog_set_url_hook(self.website)
         widgets = uistuff.GladeWidgets("PyChess.glade")
         widgets.getGlade().signal_autoconnect(GladeHandlers.__dict__)
         
@@ -243,6 +243,9 @@ class PyChess:
         #---------------------------------------------------------- About dialog
         clb = widgets["aboutdialog1"].get_child().get_children()[1].get_children()[2]
         widgets["aboutdialog1"].set_name(NAME)
+        #widgets["aboutdialog1"].set_position(gtk.WIN_POS_CENTER)
+        #widgets["aboutdialog1"].set_website_label(_("PyChess Homepage"))
+        link = widgets["aboutdialog1"].get_website()
         if os.path.isfile(prefix.addDataPrefix(".svn/entries")):
             f = open(prefix.addDataPrefix(".svn/entries"))
             line4 = [f.next() for i in xrange(4)][-1].strip()
@@ -258,7 +261,7 @@ class PyChess:
             widgets["aboutdialog1"].set_documenters(f.read().splitlines())
         with open(prefix.addDataPrefix("TRANSLATORS")) as f:
             widgets["aboutdialog1"].set_translator_credits(f.read())
-            
+
         def callback(button, *args):
             widgets["aboutdialog1"].hide()
             return True
@@ -276,6 +279,9 @@ class PyChess:
         #------------------------------------------------- Tip of the day dialog
         if conf.get("show_tip_at_startup", False):
             tipOfTheDay.TipOfTheDay.show()
+
+    def website(self, clb, link):
+        webbrowser.open(link)
     
     def widgetHandler (self, glade, functionName, widgetName, s1, s2, i1, i2):
         # Tasker is currently the only widget that uses glades CustomWidget
@@ -286,7 +292,7 @@ class PyChess:
     def handleArgs (self, chess_file):
         if chess_file:
             def do (discoverer):
-                newGameDialog.LoadFileExtension.run(chess_file, chessFiles)
+                newGameDialog.LoadFileExtension.run(chess_file)
             glock.glock_connect_after(discoverer, "all_engines_discovered", do)
 
 def run (thread_debug, chess_file):
