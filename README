@@ -1,3 +1,20 @@
+
+PyChess-Learning-Module - a free PyChess addon that teaches beginners how to play chess
+as well as helps improve the skills of intermediate players.
+
+
+
+
+
+
+
+
+for more information about PyChess see below
+
+------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------
+
 PyChess - a free chess client for Linux
 
 The mission of PyChess is to create a free, pleasant, pygtk, chess game for the
@@ -27,3 +44,4 @@ $ msgmerge oldtranslation.po newtemplate.po -o tobetranslated.po
 
 To compile the po file to an mo file (machine readable file) use
 $ msgfmt mytranslation.po -o mytranslation.mo
+
